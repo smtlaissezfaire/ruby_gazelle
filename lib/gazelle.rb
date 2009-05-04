@@ -13,9 +13,10 @@ module Gazelle
       @on[sym] = block
     end
     
-    def parse(string)
+    def run_rule(name)
+      @on[name.to_sym].call
     end
-
+    
   private
 
     def expand_path(filename)

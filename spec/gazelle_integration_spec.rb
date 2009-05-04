@@ -41,7 +41,7 @@ module Gazelle
           run = true
         end
         
-        @parser.parse("(")
+        @parser.parse("(()")
         
         run.should be_false
       end
@@ -53,7 +53,7 @@ module Gazelle
           run = true
         end
         
-        @parser.parse("()")
+        @parser.parse("(5)")
         
         run.should be_true
       end

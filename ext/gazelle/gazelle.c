@@ -1,6 +1,7 @@
 #ifndef GAZELLE_RUBY_PARSE
 #define GAZELLE_RUBY_PARSE
 
+#include <stdbool.h>
 #include <ruby.h>
 #include <gazelle/dynarray.h>
 #include "bc_read_stream.c"
@@ -29,7 +30,19 @@ static void rb_gzl_parse(char *input, struct gzl_parse_state *state, struct gzl_
   gzl_finish_parse(state);
 }
 
-static int run_grammar(char *filename, char *input) {
+static void end_rule_callback(struct gzl_parse_state *parse_state)
+{
+  struct gzl_parse_stack_frame *frame = DYNARRAY_GET_TOP(parse_state->parse_stack);
+  struct gzl_rtn_frame *rtn_frame     = &frame->f.rtn_frame;
+  
+  char *rule_name       = rtn_frame->rtn->name;
+  VALUE ruby_rule_name  = rb_str_new2(rule_name);
+  VALUE *self = (VALUE *) parse_state->user_data;
+  
+  rb_funcall(*self, rb_intern("run_rule"), 1, ruby_rule_name);
+}
+
+static int run_grammar(VALUE self, char *filename, char *input, bool run_callbacks) {
   reset_terminal_error();
   
   struct bc_read_stream *s = bc_rs_open_file(filename);
@@ -40,11 +53,16 @@ static int run_grammar(char *filename, char *input) {
   bc_rs_close_stream(s);
   
   struct gzl_parse_state *state = gzl_alloc_parse_state();
+  state->user_data = &self;
   struct gzl_bound_grammar bg = {
     .grammar           = g,
     .error_char_cb     = error_char_callback,
     .error_terminal_cb = error_terminal_callback
   };
+  
+  if (run_callbacks) {
+    bg.end_rule_cb = end_rule_callback;
+  }
   
   rb_gzl_parse(input, state, &bg);
 
@@ -56,10 +74,22 @@ static VALUE rb_gazelle_parse_p(VALUE self, VALUE input) {
   char *filename     = RSTRING_TO_PTR(compiled_file_stream);
   char *input_string = RSTRING_TO_PTR(input);
   
-  if (run_grammar(filename, input_string)) {
+  if (run_grammar(self, filename, input_string, false)) {
     return Qfalse;
   }
 
+  return(terminal_error ? Qfalse : Qtrue);
+}
+
+static VALUE rb_gazelle_parse(VALUE self, VALUE input) {
+  VALUE compiled_file_stream = rb_iv_get(self, "@filename");
+  char *filename     = RSTRING_TO_PTR(compiled_file_stream);
+  char *input_string = RSTRING_TO_PTR(input);
+  
+  if (run_grammar(self, filename, input_string, true)) {
+    return Qfalse;
+  }
+  
   return(terminal_error ? Qfalse : Qtrue);
 }
 
@@ -68,6 +98,7 @@ void Init_gazelle() {
   VALUE Gazelle_Parser  = rb_const_get_at(Gazelle, rb_intern("Parser"));
 
   rb_define_method(Gazelle_Parser, "parse?", rb_gazelle_parse_p, 1);
+  rb_define_method(Gazelle_Parser, "parse",  rb_gazelle_parse, 1);
 }
 
 #endif /* GAZELLE_RUBY_PARSE */
