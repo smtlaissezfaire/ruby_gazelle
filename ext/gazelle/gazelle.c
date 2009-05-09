@@ -75,9 +75,9 @@ static int run_grammar(VALUE self, char *filename, char *input, bool run_callbac
   reset_terminal_error();
   
   struct bc_read_stream *s = bc_rs_open_file(filename);
-  if (!s) {
+  if (!s)
     return 1; // should raise an invalid file format error in ruby instead
-  }
+
   struct gzl_grammar *g = gzl_load_grammar(s);
   bc_rs_close_stream(s);
   
@@ -104,9 +104,8 @@ static VALUE run_gazelle_parse(VALUE self, VALUE input, bool run_callbacks) {
   char *filename     = RSTRING_TO_PTR(compiled_file_stream);
   char *input_string = RSTRING_TO_PTR(input);
   
-  if (run_grammar(self, filename, input_string, run_callbacks)) {
+  if (run_grammar(self, filename, input_string, run_callbacks))
     return Qfalse;
-  }
 
   return(terminal_error ? Qfalse : Qtrue);
 }
