@@ -29,4 +29,4 @@ module Gazelle
   end
 end
 
-require File.dirname(__FILE__) + "/../ext/gazelle/gazelle"
+require File.dirname(__FILE__) + "/gazelle.bundle"
