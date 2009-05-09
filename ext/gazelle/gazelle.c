@@ -22,7 +22,7 @@ struct rb_gzl_user_data {
   char *input;
 };
 
-
+/* ERROR FUNCTIONS */
 static int terminal_error = 0;
 
 static void error_char_callback() {
@@ -37,6 +37,8 @@ static void reset_terminal_error() {
   terminal_error = 0;
 }
 
+
+/* General Gazelle integration */
 static void rb_gzl_parse(char *input, ParseState *state, BoundGrammar *bg) {
   gzl_init_parse_state(state, bg);
   gzl_parse(state, input, strlen(input) + 1);
@@ -110,6 +112,8 @@ static VALUE run_gazelle_parse(VALUE self, VALUE input, bool run_callbacks) {
   return(terminal_error ? Qfalse : Qtrue);
 }
 
+/* Public Ruby methods */
+
 static VALUE rb_gazelle_parse_p(VALUE self, VALUE input) {
   return run_gazelle_parse(self, input, false);
 }
@@ -117,6 +121,8 @@ static VALUE rb_gazelle_parse_p(VALUE self, VALUE input) {
 static VALUE rb_gazelle_parse(VALUE self, VALUE input) {
   return run_gazelle_parse(self, input, true);
 }
+
+/* Hook up the ruby methods.  Similar to lua's luaopen_(mod) functions */
 
 void Init_gazelle() {
   VALUE Gazelle         = rb_const_get(rb_cObject, rb_intern("Gazelle"));
