@@ -10,6 +10,10 @@
 
 #define RSTRING_TO_PTR(x) RSTRING(x)->ptr
 
+typedef struct gzl_parse_state   ParseState;
+typedef struct gzl_bound_grammar BoundGrammar;
+typedef struct rb_gzl_user_data  RbUserData;
+
 struct rb_gzl_user_data {
   /* The pointer to the current ruby parser object. */
   VALUE self;
@@ -33,20 +37,20 @@ static void reset_terminal_error() {
   terminal_error = 0;
 }
 
-static void rb_gzl_parse(char *input, struct gzl_parse_state *state, struct gzl_bound_grammar *bg) {
+static void rb_gzl_parse(char *input, ParseState *state, BoundGrammar *bg) {
   gzl_init_parse_state(state, bg);
   gzl_parse(state, input, strlen(input) + 1);
 }
 
-static VALUE user_data_obj(struct rb_gzl_user_data *user_data) {
+static VALUE user_data_obj(RbUserData *user_data) {
   return(user_data->self);
 }
 
-static char *user_data_input(struct rb_gzl_user_data *user_data) {
+static char *user_data_input(RbUserData *user_data) {
   return(user_data->input);
 }
 
-static void end_rule_callback(struct gzl_parse_state *parse_state)
+static void end_rule_callback(ParseState *parse_state)
 {
   struct gzl_parse_stack_frame *frame      = DYNARRAY_GET_TOP(parse_state->parse_stack);
   struct gzl_rtn_frame          *rtn_frame = &frame->f.rtn_frame;
@@ -60,8 +64,8 @@ static void end_rule_callback(struct gzl_parse_state *parse_state)
   rb_funcall(self, rb_intern("run_rule"), 2, ruby_rule_name, ruby_input);
 }
 
-static void mk_user_data(struct gzl_parse_state *state, VALUE self, char *input) {
-  struct rb_gzl_user_data *data = malloc(sizeof(struct rb_gzl_user_data *));
+static void mk_user_data(ParseState *state, VALUE self, char *input) {
+  RbUserData *data = malloc(sizeof(RbUserData *));
   data->self  = self;
   data->input = input;
   state->user_data = data;
@@ -77,10 +81,10 @@ static int run_grammar(VALUE self, char *filename, char *input, bool run_callbac
   struct gzl_grammar *g = gzl_load_grammar(s);
   bc_rs_close_stream(s);
   
-  struct gzl_parse_state *state = gzl_alloc_parse_state();
+  ParseState *state = gzl_alloc_parse_state();
   mk_user_data(state, self, input);
   
-  struct gzl_bound_grammar bg = {
+  BoundGrammar bg = {
     .grammar           = g,
     .error_char_cb     = error_char_callback,
     .error_terminal_cb = error_terminal_callback
