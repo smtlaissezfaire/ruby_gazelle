@@ -57,6 +57,28 @@ module Gazelle
         
         run.should be_true
       end
+      
+      it "should yield the text" do
+        yielded_text = nil
+        
+        @parser.on :hello do |text|
+          yielded_text = text
+        end
+        
+        @parser.parse("(5)")
+        yielded_text.should == "(5)"
+      end
+      
+      it "should yield the correct text" do
+        yielded_text = nil
+        
+        @parser.on :hello do |text|
+          yielded_text = text
+        end
+        
+        @parser.parse("((1923423))")
+        yielded_text.should == "((1923423))"
+      end
     end
   end
 end

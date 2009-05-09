@@ -10,10 +10,19 @@
 
 #define RSTRING_TO_PTR(x) RSTRING(x)->ptr
 
+struct rb_gzl_user_data {
+  /* The pointer to the current ruby parser object. */
+  VALUE self;
+  
+  /* The input given to the parse function */
+  char *input;
+};
+
+
 static int terminal_error = 0;
 
 static void error_char_callback() {
-  // do something intelligent here
+  // TODO: do something intelligent here
 }
 
 static void error_terminal_callback() {
@@ -27,19 +36,35 @@ static void reset_terminal_error() {
 static void rb_gzl_parse(char *input, struct gzl_parse_state *state, struct gzl_bound_grammar *bg) {
   gzl_init_parse_state(state, bg);
   gzl_parse(state, input, strlen(input) + 1);
-  gzl_finish_parse(state);
+}
+
+static VALUE user_data_obj(struct rb_gzl_user_data *user_data) {
+  return(user_data->self);
+}
+
+static char *user_data_input(struct rb_gzl_user_data *user_data) {
+  return(user_data->input);
 }
 
 static void end_rule_callback(struct gzl_parse_state *parse_state)
 {
-  struct gzl_parse_stack_frame *frame = DYNARRAY_GET_TOP(parse_state->parse_stack);
-  struct gzl_rtn_frame *rtn_frame     = &frame->f.rtn_frame;
+  struct gzl_parse_stack_frame *frame      = DYNARRAY_GET_TOP(parse_state->parse_stack);
+  struct gzl_rtn_frame          *rtn_frame = &frame->f.rtn_frame;
   
+  VALUE self            = user_data_obj(parse_state->user_data);
   char *rule_name       = rtn_frame->rtn->name;
   VALUE ruby_rule_name  = rb_str_new2(rule_name);
-  VALUE *self = (VALUE *) parse_state->user_data;
+  char *input           = user_data_input(parse_state->user_data);
+  VALUE ruby_input      = rb_str_new2(input);
   
-  rb_funcall(*self, rb_intern("run_rule"), 1, ruby_rule_name);
+  rb_funcall(self, rb_intern("run_rule"), 2, ruby_rule_name, ruby_input);
+}
+
+static void mk_user_data(struct gzl_parse_state *state, VALUE self, char *input) {
+  struct rb_gzl_user_data *data = malloc(sizeof(struct rb_gzl_user_data *));
+  data->self  = self;
+  data->input = input;
+  state->user_data = data;
 }
 
 static int run_grammar(VALUE self, char *filename, char *input, bool run_callbacks) {
@@ -53,7 +78,8 @@ static int run_grammar(VALUE self, char *filename, char *input, bool run_callbac
   bc_rs_close_stream(s);
   
   struct gzl_parse_state *state = gzl_alloc_parse_state();
-  state->user_data = &self;
+  mk_user_data(state, self, input);
+  
   struct gzl_bound_grammar bg = {
     .grammar           = g,
     .error_char_cb     = error_char_callback,

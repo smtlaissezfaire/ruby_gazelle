@@ -13,12 +13,12 @@ module Gazelle
       @on[sym] = block
     end
     
-    def run_rule(name)
-      @on[name.to_sym].call
-    end
-    
   private
-
+  
+    def run_rule(name, str)
+      @on[name.to_sym].call(str)
+    end
+  
     def expand_path(filename)
       File.expand_path(filename)
     end
