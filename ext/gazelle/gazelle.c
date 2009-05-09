@@ -99,28 +99,24 @@ static int run_grammar(VALUE self, char *filename, char *input, bool run_callbac
   return 0;
 }
 
-static VALUE rb_gazelle_parse_p(VALUE self, VALUE input) {
+static VALUE run_gazelle_parse(VALUE self, VALUE input, bool run_callbacks) {
   VALUE compiled_file_stream = rb_iv_get(self, "@filename");
   char *filename     = RSTRING_TO_PTR(compiled_file_stream);
   char *input_string = RSTRING_TO_PTR(input);
   
-  if (run_grammar(self, filename, input_string, false)) {
+  if (run_grammar(self, filename, input_string, run_callbacks)) {
     return Qfalse;
   }
 
   return(terminal_error ? Qfalse : Qtrue);
 }
 
+static VALUE rb_gazelle_parse_p(VALUE self, VALUE input) {
+  return run_gazelle_parse(self, input, false);
+}
+
 static VALUE rb_gazelle_parse(VALUE self, VALUE input) {
-  VALUE compiled_file_stream = rb_iv_get(self, "@filename");
-  char *filename     = RSTRING_TO_PTR(compiled_file_stream);
-  char *input_string = RSTRING_TO_PTR(input);
-  
-  if (run_grammar(self, filename, input_string, true)) {
-    return Qfalse;
-  }
-  
-  return(terminal_error ? Qfalse : Qtrue);
+  return run_gazelle_parse(self, input, true);
 }
 
 void Init_gazelle() {
