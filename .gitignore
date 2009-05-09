@@ -1,3 +1,4 @@
 *.bundle
 *.o
 tmp/
+TAGS
