@@ -7,20 +7,7 @@
 #include "bc_read_stream.c"
 #include "load_grammar.c"
 #include "parse.c"
-
-#define RSTRING_TO_PTR(x) RSTRING(x)->ptr
-
-typedef struct gzl_parse_state   ParseState;
-typedef struct gzl_bound_grammar BoundGrammar;
-typedef struct rb_gzl_user_data  RbUserData;
-
-struct rb_gzl_user_data {
-  /* The pointer to the current ruby parser object. */
-  VALUE self;
-  
-  /* The input given to the parse function */
-  char *input;
-};
+#include "gazelle.h"
 
 /* ERROR FUNCTIONS */
 static int terminal_error = 0;
