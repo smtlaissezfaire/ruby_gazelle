@@ -13,6 +13,10 @@ module Gazelle
       @on[sym] = block
     end
     
+    def rules(&block)
+      instance_eval(&block)
+    end
+    
   private
   
     def run_rule(name, str)

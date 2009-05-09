@@ -79,6 +79,19 @@ module Gazelle
         @parser.parse("((1923423))")
         yielded_text.should == "((1923423))"
       end
+      
+      it "should be able to parse a rule with a block" do
+        yielded_text = nil
+        
+        @parser.rules do
+          on :hello do |text|
+            yielded_text = text
+          end
+        end
+        
+        @parser.parse("(5)")
+        yielded_text.should == "(5)"
+      end
     end
   end
 end
