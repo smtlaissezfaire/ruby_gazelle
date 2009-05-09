@@ -4,11 +4,9 @@
 #include <stdbool.h>
 #include <ruby.h>
 #include <gazelle/dynarray.h>
-
 #include "includes/bc_read_stream.c"
 #include "includes/load_grammar.c"
 #include "includes/parse.c"
-
 #include "gazelle.h"
 
 /* ERROR FUNCTIONS */
