@@ -24,7 +24,6 @@ static void reset_terminal_error() {
   terminal_error = 0;
 }
 
-
 /* General Gazelle integration */
 static void rb_gzl_parse(char *input, ParseState *state, BoundGrammar *bg) {
   gzl_init_parse_state(state, bg);
@@ -100,7 +99,6 @@ static VALUE run_gazelle_parse(VALUE self, VALUE input, bool run_callbacks) {
 }
 
 /* Public Ruby methods */
-
 static VALUE rb_gazelle_parse_p(VALUE self, VALUE input) {
   return run_gazelle_parse(self, input, false);
 }
@@ -110,7 +108,6 @@ static VALUE rb_gazelle_parse(VALUE self, VALUE input) {
 }
 
 /* Hook up the ruby methods.  Similar to lua's luaopen_(mod) functions */
-
 void Init_gazelle() {
   VALUE Gazelle         = rb_const_get(rb_cObject, rb_intern("Gazelle"));
   VALUE Gazelle_Parser  = rb_const_get_at(Gazelle, rb_intern("Parser"));
