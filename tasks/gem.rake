@@ -5,11 +5,14 @@ PROJECT_NAME = "gazelle"
 begin
   require 'jeweler'
   spec = Gem::Specification.new do |s|
+    summary = "Ruby bindings for the Gazelle parser-generator"
+
     s.name        = PROJECT_NAME
-    s.summary     = "Ruby bindings for the Gazelle parser-generator"
+    s.summary     = summary
+    s.description = summary
+    
     s.email       = "scott@railsnewbie.com"
     s.homepage    = "http://github.com/smtlaissezfaire/#{PROJECT_NAME.downcase}"
-    s.description = "TODO"
     s.authors     = ["Scott Taylor"]
 
     s.platform    = Gem::Platform::RUBY
