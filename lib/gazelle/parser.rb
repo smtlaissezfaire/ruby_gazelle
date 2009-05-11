@@ -5,11 +5,11 @@ module Gazelle
       raise(Errno::ENOENT) unless File.exists?(file)
       
       @filename = file
-      @on = {}
+      @rules = {}
     end
     
-    def on(id, &block)
-      @on[id.to_sym] = block
+    def on(action, &block)
+      @rules[action.to_sym] = block
     end
     
     def rules(&block)
@@ -18,8 +18,8 @@ module Gazelle
     
   private
   
-    def run_rule(name, str)
-      if rule = @on[name.to_sym]
+    def run_rule(action, str)
+      if rule = @rules[action.to_sym]
         rule.call(str)
       end
     end
