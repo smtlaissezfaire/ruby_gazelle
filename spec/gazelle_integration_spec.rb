@@ -92,6 +92,16 @@ module Gazelle
         @parser.parse("(5)")
         yielded_text.should == "(5)"
       end
+      
+      it "should not raise an error if there is no action for a given rule" do
+        lambda {
+          @parser.parse("(5)")
+        }.should_not raise_error
+      end
+      
+      it "should return true when the parse matches, but there is no triggered rule" do
+        @parser.parse("(5)").should be_true
+      end
     end
   end
 end

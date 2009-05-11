@@ -19,7 +19,9 @@ module Gazelle
   private
   
     def run_rule(name, str)
-      @on[name.to_sym].call(str)
+      if rule = @on[name.to_sym]
+        rule.call(str)
+      end
     end
   
     def expand_path(filename)
