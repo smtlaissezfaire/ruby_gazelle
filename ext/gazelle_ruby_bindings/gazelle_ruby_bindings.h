@@ -1,5 +1,5 @@
-#ifndef GAZELLE_RUBY_PARSE_H
-#define GAZELLE_RUBY_PARSE_H
+#ifndef GAZELLE_RUBY_BINDINGS_H
+#define GAZELLE_RUBY_BINDINGS_H
 
 #define RSTRING_TO_PTR(x) RSTRING(x)->ptr
 
@@ -15,6 +15,6 @@ struct rb_gzl_user_data {
   char *input;
 };
 
-void Init_gazelle();
+void Init_gazelle_ruby_bindings();
 
-#endif /* GAZELLE_RUBY_PARSE_H */
+#endif /* GAZELLE_RUBY_BINDINGS_H */

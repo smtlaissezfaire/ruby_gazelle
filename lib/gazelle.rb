@@ -9,5 +9,3 @@ module Gazelle
   using :Parser
   using :Gemspec
 end
-
-require File.dirname(__FILE__) + "/gazelle.bundle"

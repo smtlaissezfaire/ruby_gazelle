@@ -1,5 +1,5 @@
-#ifndef GAZELLE_RUBY_PARSE
-#define GAZELLE_RUBY_PARSE
+#ifndef GAZELLE_RUBY_BINDINGS_C
+#define GAZELLE_RUBY_BINDINGS_C
 
 #include <stdbool.h>
 #include <ruby.h>
@@ -7,7 +7,7 @@
 #include "includes/bc_read_stream.c"
 #include "includes/load_grammar.c"
 #include "includes/parse.c"
-#include "gazelle.h"
+#include "gazelle_ruby_bindings.h"
 
 /* ERROR FUNCTIONS */
 static int terminal_error = 0;
@@ -108,7 +108,7 @@ static VALUE rb_gazelle_parse(VALUE self, VALUE input) {
 }
 
 /* Hook up the ruby methods.  Similar to lua's luaopen_(mod) functions */
-void Init_gazelle() {
+void Init_gazelle_ruby_bindings() {
   VALUE Gazelle         = rb_const_get(rb_cObject, rb_intern("Gazelle"));
   VALUE Gazelle_Parser  = rb_const_get_at(Gazelle, rb_intern("Parser"));
 
@@ -116,4 +116,4 @@ void Init_gazelle() {
   rb_define_method(Gazelle_Parser, "parse",  rb_gazelle_parse, 1);
 }
 
-#endif /* GAZELLE_RUBY_PARSE */
+#endif /* GAZELLE_RUBY_BINDINGS_C */

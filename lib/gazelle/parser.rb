@@ -27,3 +27,5 @@ module Gazelle
     end
   end
 end
+
+require File.dirname(__FILE__) + "/../gazelle_ruby_bindings"
