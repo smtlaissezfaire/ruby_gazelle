@@ -102,6 +102,17 @@ module Gazelle
       it "should return true when the parse matches, but there is no triggered rule" do
         @parser.parse("(5)").should be_true
       end
+      
+      it "should be able to call a rule defined with a string, but called with a symbol" do
+        called = false
+        
+        @parser.on "hello" do
+          called = true
+        end
+        
+        @parser.parse("(5)")
+        called.should be_true
+      end
     end
   end
 end

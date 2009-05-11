@@ -8,8 +8,8 @@ module Gazelle
       @on = {}
     end
     
-    def on(sym, &block)
-      @on[sym] = block
+    def on(id, &block)
+      @on[id.to_sym] = block
     end
     
     def rules(&block)
