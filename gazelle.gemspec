@@ -12,12 +12,9 @@ Gem::Specification.new do |s|
   s.extensions = ["ext/gazelle_ruby_bindings/extconf.rb"]
   s.files = [
     "Rakefile",
-    "ext/gazelle_ruby_bindings/Makefile",
     "ext/gazelle_ruby_bindings/extconf.rb",
-    "ext/gazelle_ruby_bindings/gazelle_ruby_bindings.bundle",
     "ext/gazelle_ruby_bindings/gazelle_ruby_bindings.c",
     "ext/gazelle_ruby_bindings/gazelle_ruby_bindings.h",
-    "ext/gazelle_ruby_bindings/gazelle_ruby_bindings.o",
     "ext/gazelle_ruby_bindings/includes/bc_read_stream.c",
     "ext/gazelle_ruby_bindings/includes/load_grammar.c",
     "ext/gazelle_ruby_bindings/includes/parse.c",

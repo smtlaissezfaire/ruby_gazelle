@@ -21,12 +21,14 @@ module Gazelle
         s.platform    = Gem::Platform::RUBY
         s.extensions  = FileList["ext/**/extconf.rb"]
         s.files       = FileList[
-                                 "ext/**/*",
-                                 "lib/**/*.rb",
-                                 "spec/**/**",
-                                 "Rakefile",
-                                 "tasks/**/*.rake"
-                                ]
+                          "ext/**/*.rb",
+                          "ext/**/*.c",
+                          "ext/**/*.h",
+                          "lib/**/*.rb",
+                          "spec/**/**",
+                          "Rakefile",
+                          "tasks/**/*.rake"
+                        ]
         
         yield(s) if block_given?
       end
