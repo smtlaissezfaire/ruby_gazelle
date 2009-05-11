@@ -29,6 +29,8 @@ module Gazelle
                           "Rakefile",
                           "tasks/**/*.rake"
                         ]
+
+        s.add_dependency "smtlaissezfaire-using"
         
         yield(s) if block_given?
       end
