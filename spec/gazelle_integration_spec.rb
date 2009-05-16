@@ -131,6 +131,32 @@ module Gazelle
           @parser.parse("CREATE TABLE foo (bar BIT)")
           yielded_text.should == ["foo", "bar"]
         end
+
+        it "should yield the column_names_and_types subnode" do
+          pending 'TODO: ISSUE #5 on github' do
+            yielded_text = nil
+            
+            @parser.on :column_names_and_types do |str|
+              yielded_text = str
+            end
+   
+            @parser.parse("CREATE TABLE foo (bar BIT)")
+            yielded_text.should == "bar BIT"
+          end
+        end
+
+        it "should yield the correct ID (without spaces or extra crap)" do
+          pending "FIXME" do
+            yielded_text = []
+   
+            @parser.on :ID do |text|
+              yielded_text << text
+            end
+   
+            @parser.parse("CREATE TABLE foo (bar BIT)")
+            yielded_text.should == ["foo", "bar"]
+          end
+        end
       end
     end
   end
