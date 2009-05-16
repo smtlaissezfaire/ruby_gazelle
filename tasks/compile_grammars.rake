@@ -11,6 +11,7 @@ module Gazelle
 end
 
 namespace :compile do
+  desc "Compile all .gzl grammars in the project"
   task :grammars do
     FileList["**/*.gzl"].each do |file|
       Gazelle::Compilation.compile(file)
