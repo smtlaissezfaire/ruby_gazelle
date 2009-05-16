@@ -15,12 +15,36 @@ module Gazelle
     def rules(&block)
       instance_eval(&block)
     end
+
+    attr_writer :debug
+
+    def debugging?
+      @debug ? true : false
+    end
+
+    def debug_stream
+      @debug_stream || $stdout
+    end
+
+    attr_writer :debug_stream
     
-  private
-  
     def run_rule(action, str)
-      if rule = @rules[action.to_sym]
+      with_action(action, str) do |rule|
         rule.call(str)
+      end
+    end
+
+private
+
+    def with_action(action, str)
+      debugging = debugging?
+      stream    = self.debug_stream
+
+      stream << "rule: '#{action}'\n  string: '#{str}'\n" if debugging
+
+      if rule = @rules[action.to_sym]
+        stream << "  YIELDING TO RULE\n" if debugging
+        yield(rule)
       end
     end
   

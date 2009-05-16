@@ -159,5 +159,84 @@ module Gazelle
         end
       end
     end
+
+    describe "debugging" do
+      before do
+        @parser = Gazelle::Parser.new(File.dirname(__FILE__) + "/create_table.gzc")
+        @debug_stream = ""
+      end
+
+      it "should be able to turn it on" do
+        @parser.debug = true
+        @parser.should be_debugging
+      end
+
+      it "should not be debugging by default" do
+        @parser.should_not be_debugging
+      end
+
+      it "should return false to debugging?" do
+        @parser.debugging?.should be_false
+      end
+
+      it "should have the default stream as stdout" do
+        @parser.debug_stream.should equal($stdout)
+      end
+
+      it "should be able to set (and get) the debug stream" do
+        @parser.debug_stream = @debug_stream
+        @parser.debug_stream.should equal(@debug_stream)
+      end
+
+      describe "running a rule" do
+        before do
+          @parser
+          @parser.debug = true
+          @parser.debug_stream = @debug_stream
+        end
+
+        def run_parser
+          @parser.parse("CREATE TABLE foo (bar BIT)")
+        end
+
+        it "should send the '<<' message to the stream with a rule, when run" do
+          @debug_stream.should_receive(:<<).with(any_args).any_number_of_times.and_return true
+          run_parser
+        end
+
+        it "should not have an empty stream if a rule is hit" do
+          run_parser
+          @debug_stream.should_not be_empty
+        end
+
+        it "should not send the message if not in debug mode" do
+          @parser.debug = false
+          run_parser
+          @debug_stream.should be_empty
+        end
+
+        it "should give the rule name in the stream" do
+          @parser.run_rule :foo, "something"
+          @debug_stream.should include("rule: 'foo'\n  string: 'something'\n")
+        end
+
+        it "should use the correct rule name" do
+          @parser.run_rule :bar, "something"
+          @debug_stream.should include("rule: 'bar'\n  string: 'something'\n")
+        end
+
+        it "should use the string matched" do
+          @parser.run_rule :foo, "bar"
+          @debug_stream.should include("rule: 'foo'\n  string: 'bar'\n")
+        end
+
+        it "should add the knowledge of yielding to the rule" do
+          @parser.on(:foo) { }
+          
+          @parser.run_rule :foo, "bar"
+          @debug_stream.should include("rule: 'foo'\n  string: 'bar'\n  YIELDING TO RULE\n")
+        end
+      end
+    end
   end
 end
