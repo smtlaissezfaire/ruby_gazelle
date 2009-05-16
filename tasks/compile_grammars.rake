@@ -19,3 +19,4 @@ namespace :compile do
   end
 end
 
+task :compile => ["compile:grammars"]
