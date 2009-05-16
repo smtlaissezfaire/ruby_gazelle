@@ -1,5 +1,7 @@
 module Gazelle
   class Parser
+    include DebuggingSupport
+    
     def initialize(filename)
       file = expand_path(filename)
       raise(Errno::ENOENT) unless File.exists?(file)
@@ -18,16 +20,6 @@ module Gazelle
 
     attr_writer :debug
 
-    def debugging?
-      @debug ? true : false
-    end
-
-    def debug_stream
-      @debug_stream || $stdout
-    end
-
-    attr_writer :debug_stream
-    
     def run_rule(action, str)
       with_action(action, str) do |rule|
         rule.call(str)
