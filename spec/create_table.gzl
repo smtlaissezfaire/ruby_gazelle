@@ -1,0 +1,36 @@
+
+create_table ->
+  CREATE WS+ TABLE WS+ ID WS+
+  OPEN_PAREN WS* column_names_and_types WS* CLOSE_PAREN;
+  
+column_names_and_types ->
+  column_name_and_type WS* COMMA WS* column_names_and_types /
+  column_name_and_type;
+  
+column_name_and_type ->
+  column_name WS+ column_type;
+  
+column_type ->
+  BIT /
+  INT OPEN_PAREN INT_SIZE CLOSE_PAREN;
+  
+BIT: /BIT/;
+INT: /INT/;
+INT_SIZE: /11/;
+
+table_name           -> ID;
+column_name          -> ID;
+
+ID           -> QUOTED_ID / UNQUOTED_ID;
+QUOTED_ID    -> BACKTICK UNQUOTED_ID BACKTICK;
+UNQUOTED_ID   : /[a-z\_]+/;
+
+WS                  -> " ";
+OPEN_PAREN          :  /\(/;
+CLOSE_PAREN         :  /\)/;
+BACKTICK            :  /\`/;
+COMMA               :  /\,/;
+
+
+CREATE: /CREATE/;
+TABLE : /TABLE/;

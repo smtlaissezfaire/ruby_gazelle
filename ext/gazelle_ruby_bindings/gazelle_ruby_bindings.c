@@ -1,6 +1,7 @@
 #ifndef GAZELLE_RUBY_BINDINGS_C
 #define GAZELLE_RUBY_BINDINGS_C
 
+#include <string.h>
 #include <stdbool.h>
 #include <ruby.h>
 #include <gazelle/dynarray.h>
@@ -34,32 +35,62 @@ static VALUE user_data_obj(RbUserData *user_data) {
   return(user_data->self);
 }
 
-static char *user_data_input(RbUserData *user_data) {
-  return(user_data->input);
+static VALUE user_data_input(RbUserData *user_data) {
+  return(user_data->rb_input);
+}
+
+static VALUE rb_str_boundaries(VALUE str, int start, int end) {
+  VALUE range  = rb_funcall(rb_cRange, rb_intern("new"), 2, INT2FIX(start), INT2FIX(end));
+  return rb_funcall(str, rb_intern("[]"), 1, range);
+}
+
+static VALUE rb_user_data_input(ParseState *parse_state, ParseStackFrame *frame) {
+  VALUE rb_input = user_data_input(parse_state->user_data);
+  size_t start = frame->start_offset.byte;
+  size_t end   = parse_state->offset.byte;
+
+  return rb_str_boundaries(rb_input, (int) start, (int) end);
 }
 
 static void end_rule_callback(ParseState *parse_state)
 {
   struct gzl_parse_stack_frame *frame      = DYNARRAY_GET_TOP(parse_state->parse_stack);
-  struct gzl_rtn_frame          *rtn_frame = &frame->f.rtn_frame;
+  struct gzl_rtn_frame         *rtn_frame  = &frame->f.rtn_frame;
   
   VALUE self            = user_data_obj(parse_state->user_data);
-  char *rule_name       = rtn_frame->rtn->name;
-  VALUE ruby_rule_name  = rb_str_new2(rule_name);
-  char *input           = user_data_input(parse_state->user_data);
-  VALUE ruby_input      = rb_str_new2(input);
   
+  char *rule_name       = rtn_frame->rtn->name;
+
+  VALUE ruby_rule_name  = rb_str_new2(rule_name);
+  VALUE ruby_input      = rb_user_data_input(parse_state, frame);
+
   rb_funcall(self, rb_intern("run_rule"), 2, ruby_rule_name, ruby_input);
 }
 
-static void mk_user_data(ParseState *state, VALUE self, char *input) {
+static void terminal_callback(ParseState *parse_state, struct gzl_terminal *terminal) {
+
+  VALUE rb_input = user_data_input(parse_state->user_data);
+  size_t start = terminal->offset.byte;
+  size_t end   = start + terminal->len - 1;
+
+  VALUE ruby_rule_name = rb_str_new2(terminal->name);
+  VALUE ruby_input = rb_str_boundaries(rb_input, (int) start, (int) end);
+  VALUE self       = user_data_obj(parse_state->user_data);
+
+  rb_funcall(self, rb_intern("run_rule"), 2, ruby_rule_name, ruby_input);
+}
+
+static void mk_user_data(ParseState *state, VALUE self, char *input, VALUE rb_input) {
   RbUserData *data = malloc(sizeof(RbUserData *));
-  data->self  = self;
-  data->input = input;
+  
+  data->self     = self;
+  data->input    = input;
+  data->rb_input = rb_input;
+  
   state->user_data = data;
 }
 
-static int run_grammar(VALUE self, char *filename, char *input, bool run_callbacks) {
+static int run_grammar(VALUE self, char *filename, VALUE rb_input, char *input, bool run_callbacks) {
   reset_terminal_error();
   
   struct bc_read_stream *s = bc_rs_open_file(filename);
@@ -70,7 +101,7 @@ static int run_grammar(VALUE self, char *filename, char *input, bool run_callbac
   bc_rs_close_stream(s);
   
   ParseState *state = gzl_alloc_parse_state();
-  mk_user_data(state, self, input);
+  mk_user_data(state, self, input, rb_input);
   
   BoundGrammar bg = {
     .grammar           = g,
@@ -80,6 +111,7 @@ static int run_grammar(VALUE self, char *filename, char *input, bool run_callbac
   
   if (run_callbacks) {
     bg.end_rule_cb = end_rule_callback;
+    bg.terminal_cb = terminal_callback;
   }
   
   rb_gzl_parse(input, state, &bg);
@@ -92,7 +124,7 @@ static VALUE run_gazelle_parse(VALUE self, VALUE input, bool run_callbacks) {
   char *filename     = RSTRING_TO_PTR(compiled_file_stream);
   char *input_string = RSTRING_TO_PTR(input);
   
-  if (run_grammar(self, filename, input_string, run_callbacks))
+  if (run_grammar(self, filename, input, input_string, run_callbacks))
     return Qfalse;
 
   return(terminal_error ? Qfalse : Qtrue);

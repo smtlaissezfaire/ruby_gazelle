@@ -1,0 +1,11 @@
+static void terminal_callback(ParseState *parse_state, struct gzl_terminal *terminal) {
+
+  VALUE rb_input = user_data_input(parse_state->user_data);
+  size_t start = terminal->offset.byte;
+  size_t end   = start + terminal->len - 1;
+
+  VALUE str = rb_str_boundaries(rb_input, (int) start, (int) end);
+  
+  printf("TERM NAME: %s, terminal string: %s\n", terminal->name, RSTRING_TO_PTR(str));
+}
+

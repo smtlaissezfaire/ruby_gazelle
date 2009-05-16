@@ -114,5 +114,24 @@ module Gazelle
         called.should be_true
       end
     end
+    
+    describe "parsing subnodes" do
+      context "a create statement in a sql parser" do
+        before do
+          @parser = Gazelle::Parser.new(File.dirname(__FILE__) + "/create_table.gzc")
+        end
+
+        it "should yield the correct table name + column name" do
+          yielded_text = []
+
+          @parser.on :UNQUOTED_ID do |text|
+            yielded_text << text
+          end
+
+          @parser.parse("CREATE TABLE foo (bar BIT)")
+          yielded_text.should == ["foo", "bar"]
+        end
+      end
+    end
   end
 end
