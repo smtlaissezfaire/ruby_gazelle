@@ -3,7 +3,7 @@ module Gazelle
     include DebuggingSupport
     
     def initialize(filename)
-      file = expand_path(filename)
+      file = add_extension(expand_path(filename))
       raise(Errno::ENOENT) unless File.exists?(file)
       
       @filename = file
@@ -42,6 +42,10 @@ private
   
     def expand_path(filename)
       File.expand_path(filename)
+    end
+
+    def add_extension(filename)
+      filename.include?(".gzc") ? filename : "#{filename}.gzc"
     end
   end
 end

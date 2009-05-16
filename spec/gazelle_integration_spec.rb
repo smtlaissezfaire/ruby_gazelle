@@ -13,6 +13,16 @@ module Gazelle
         parser.parse?("(()").should be_false
       end
 
+      it "should find the file even when given with a short path" do
+        parser = Parser.new("spec/hello.gzc")
+        parser.parse("(5)").should be_true
+      end
+
+      it "should find the file when it is missing the .gzc extension" do
+        parser = Parser.new("spec/hello")
+        parser.parse("(5)").should be_true
+      end
+
       it "should raise an 'Errno::ENOENT' error if the file does not exist" do
         file = "#{File.dirname(__FILE__)}/non-existant-file"
         
