@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{gazelle}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Scott Taylor"]
-  s.date = %q{2009-05-10}
+  s.date = %q{2009-05-20}
   s.description = %q{Ruby bindings for the Gazelle parser-generator}
   s.email = %q{scott@railsnewbie.com}
   s.extensions = ["ext/gazelle_ruby_bindings/extconf.rb"]
@@ -19,8 +19,11 @@ Gem::Specification.new do |s|
     "ext/gazelle_ruby_bindings/includes/load_grammar.c",
     "ext/gazelle_ruby_bindings/includes/parse.c",
     "lib/gazelle.rb",
+    "lib/gazelle/debugging_support.rb",
     "lib/gazelle/gemspec.rb",
     "lib/gazelle/parser.rb",
+    "spec/create_table.gzc",
+    "spec/create_table.gzl",
     "spec/gazelle_integration_spec.rb",
     "spec/hello.gzc",
     "spec/hello.gzl",
@@ -28,6 +31,7 @@ Gem::Specification.new do |s|
     "spec/spec.opts",
     "spec/spec_helper.rb",
     "tasks/c_extensions.rake",
+    "tasks/compile_grammars.rake",
     "tasks/flog.rake",
     "tasks/gem.rake",
     "tasks/rspec.rake",
