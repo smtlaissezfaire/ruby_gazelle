@@ -15,12 +15,12 @@ module Gazelle
 
       it "should find the file even when given with a short path" do
         parser = Parser.new("spec/hello.gzc")
-        parser.parse("(5)").should be_true
+        parser.parse?("(5)").should be_true
       end
 
       it "should find the file when it is missing the .gzc extension" do
         parser = Parser.new("spec/hello")
-        parser.parse("(5)").should be_true
+        parser.parse?("(5)").should be_true
       end
 
       it "should raise an 'Errno::ENOENT' error if the file does not exist" do
@@ -109,10 +109,6 @@ module Gazelle
         }.should_not raise_error
       end
       
-      it "should return true when the parse matches, but there is no triggered rule" do
-        @parser.parse("(5)").should be_true
-      end
-      
       it "should be able to call a rule defined with a string, but called with a symbol" do
         called = false
         
@@ -122,6 +118,14 @@ module Gazelle
         
         @parser.parse("(5)")
         called.should be_true
+      end
+
+      it "should return the result of the last rule" do
+        @parser.on "hello" do
+          5
+        end
+
+        @parser.parse("(5)").should == 5
       end
     end
     

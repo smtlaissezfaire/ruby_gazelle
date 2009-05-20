@@ -136,7 +136,8 @@ static VALUE rb_gazelle_parse_p(VALUE self, VALUE input) {
 }
 
 static VALUE rb_gazelle_parse(VALUE self, VALUE input) {
-  return run_gazelle_parse(self, input, true);
+  run_gazelle_parse(self, input, true);
+  return rb_ivar_get(self, rb_intern("@last_result"));
 }
 
 /* Hook up the ruby methods.  Similar to lua's luaopen_(mod) functions */

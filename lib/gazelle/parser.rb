@@ -21,7 +21,7 @@ module Gazelle
     attr_writer :debug
 
     def run_rule(action, str)
-      with_action(action, str) do |rule|
+      @last_result = with_action(action, str) do |rule|
         rule.call(str)
       end
     end
